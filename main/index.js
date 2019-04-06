@@ -16,23 +16,26 @@ const iconPath = resolvePath(`./main/static/tray/${iconName}.png`);
 // be closed automatically when the JavaScript object is garbage collected.
 let mainWindow;
 let tray = null
+// Create the main window
 function createWindow () {
   // Create the browser window.
   mainWindow = new BrowserWindow({
-    width: 315,
+    // width: 315,
+    // height: 400,
+    width: 815,
     height: 400,
     webPreferences: {
       nodeIntegration: true
     },
-    frame: false,
+    // frame: false,
     resizable: false,
-    show: false,
+    // show: false,
   })
 
   // and load the index.html of the app.
   mainWindow.loadURL(entry)
   // Open the DevTools.
-  // mainWindow.webContents.openDevTools()
+  mainWindow.webContents.openDevTools()
 
   // Emitted when the window is closed.
   mainWindow.on('closed', function () {
@@ -40,6 +43,26 @@ function createWindow () {
     // in an array if your app supports multi windows, this is the time
     // when you should delete the corresponding element.
     mainWindow = null
+  })
+}
+
+// Toggle window thru Tray
+function toggleWindow (window, tray) {
+  tray.on('click', (event, bounds) => {
+    const { x, y } = bounds;
+    const { height, width } = window.getBounds();
+    const _x = Math.round(x - (width / 2));
+    if(window.isVisible()) {
+      window.hide() 
+    } else {
+      window.setBounds({
+        x: _x,
+        y,
+        height,
+        width
+      })
+      window.show()
+    }
   })
 }
 
@@ -52,22 +75,7 @@ app.on('ready', async () => {
   createWindow()
   tray = new Tray(iconPath);
   tray.setToolTip('Taskr')
-  tray.on('click', (event, bounds) => {
-    const { x, y } = bounds;
-    const { height, width } = mainWindow.getBounds();
-    const _x = Math.round(x - (width / 2));
-    if(mainWindow.isVisible()) {
-      mainWindow.hide() 
-    } else {
-      mainWindow.setBounds({
-        x: _x,
-        y,
-        height,
-        width
-      })
-      mainWindow.show()
-    }
-  })
+  toggleWindow(mainWindow, tray);
 })
 
 // Quit when all windows are closed.

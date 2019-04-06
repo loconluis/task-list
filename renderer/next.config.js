@@ -1,4 +1,6 @@
-module.exports = {
+const withImages = require('next-images')
+
+module.exports = withImages({
   webpack(config) {
     // Allows you to load Electron modules and
     // native Node.js ones into your renderer
@@ -13,4 +15,4 @@ module.exports = {
       '/start': { page: '/start' }
     }
   }
-}
+})
